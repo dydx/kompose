@@ -77,7 +77,6 @@ func CreateTarball(source, target string) error {
 				} else {
 					header.Name = filepath.Join(baseDir, strings.TrimPrefix(path, source))
 				}
-				//println("Header name", header.Name)
 			}
 
 			if err := tarball.WriteHeader(header); err != nil {
@@ -93,9 +92,11 @@ func CreateTarball(source, target string) error {
 			}
 
 			file, err := os.Open(path)
+
 			if err != nil {
 				return err
 			}
+
 			defer file.Close()
 			_, err = io.Copy(tarball, file)
 			return err
