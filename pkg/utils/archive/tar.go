@@ -57,7 +57,16 @@ func CreateTarball(source, target string) error {
 			if err != nil {
 				return err
 			}
-			header, err := tar.FileInfoHeader(info, info.Name())
+
+			var symLink string
+			// checking for symlinks
+			if info.Mode()&os.ModeSymlink == os.ModeSymlink {
+				// Allow symlinks
+				if symLink, err = os.Readlink(path); err != nil {
+					return err
+				}
+			}
+			header, err := tar.FileInfoHeader(info, symLink)
 			if err != nil {
 				return err
 			}
@@ -73,6 +82,10 @@ func CreateTarball(source, target string) error {
 
 			if err := tarball.WriteHeader(header); err != nil {
 				return err
+			}
+
+			if !info.Mode().IsRegular() {
+				return nil
 			}
 
 			if info.IsDir() {
